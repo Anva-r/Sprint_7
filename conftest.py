@@ -49,7 +49,11 @@ def courier_factory():
 
     for courier_id in reversed(created_courier_ids):
         with allure.step(f"Очистить курьера с id={courier_id}"):
-            CourierApi.delete(courier_id)
+            cleanup_response = CourierApi.delete(courier_id)
+            assert cleanup_response.status_code in (200, 404), (
+                f"Не удалось удалить курьера {courier_id}: "
+                f"{cleanup_response.status_code} {cleanup_response.text}"
+            )
 
 
 @pytest.fixture
@@ -87,8 +91,20 @@ def order_factory():
     for track, order_id in reversed(created_orders):
         with allure.step(f"Очистить заказ с трек-номером {track}"):
             cancel_response = OrderApi.cancel(track)
-            if cancel_response.status_code == 409 and order_id is not None:
-                OrderApi.finish(order_id)
+            if cancel_response.status_code == 200:
+                assert cancel_response.json() == {"ok": True}
+            elif cancel_response.status_code == 409 and order_id is not None:
+                finish_response = OrderApi.finish(order_id)
+                assert finish_response.status_code == 200, (
+                    f"Не удалось завершить принятый заказ {order_id}: "
+                    f"{finish_response.status_code} {finish_response.text}"
+                )
+                assert finish_response.json() == {"ok": True}
+            else:
+                pytest.fail(
+                    f"Не удалось очистить заказ {track}: "
+                    f"{cancel_response.status_code} {cancel_response.text}"
+                )
 
 
 @pytest.fixture

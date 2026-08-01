@@ -1,7 +1,8 @@
+.idea/
 .venv/
+.DS_Store
 __pycache__/
 *.py[cod]
 .pytest_cache/
-.idea/
-.DS_Store
+geckodriver.log
 allure-report/

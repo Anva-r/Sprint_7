@@ -14,7 +14,7 @@ class TestCreateOrder:
         ids=[case[0] for case in TestData.ORDER_COLORS],
     )
     @allure.title("Заказ можно создать с вариантом цвета: {case_name}")
-    def test_create_order_with_color_options_returns_track(
+    def test_create_order_with_color_options_returns_201_and_track(
         self,
         order_factory,
         case_name,

@@ -1,6 +1,5 @@
 import allure
 import pytest
-import requests
 
 from api.courier_api import CourierApi
 from data import ResponseMessages, TestData
@@ -41,13 +40,7 @@ class TestCourierLogin:
             missing_field,
         )
 
-        try:
-            response = CourierApi.login(credentials, timeout=10)
-        except requests.ReadTimeout:
-            pytest.fail(
-                f"API не вернул 400 для запроса без поля {missing_field}",
-                pytrace=False,
-            )
+        response = CourierApi.login(credentials, timeout=10)
 
         assert response.status_code == 400
         assert response.json() == ResponseMessages.LOGIN_MISSING_DATA
